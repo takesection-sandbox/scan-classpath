@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework:spring-context:4.3.2.RELEASE'
+
+    testCompile 'org.springframework:spring-test:4.3.2.RELEASE'
+}

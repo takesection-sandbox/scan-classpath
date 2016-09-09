@@ -9,8 +9,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 
 public class ClasspathScanner {
 
@@ -42,16 +44,19 @@ public class ClasspathScanner {
         }
     }
 
-    public <R> R scan(ClassLoader classLoader, String path, BiFunction<String, Stream<JarFile>, R> mapper) throws IOException {
+    public <R> R scan(ClassLoader classLoader, String path, BiFunction<String, Stream<ZipEntry>, R> mapper) throws IOException {
         Enumeration<URL> urls = classLoader.getResources(path);
         List<JarFile> list = new ArrayList<>();
         while (urls.hasMoreElements()) {
             getJarFile(urls.nextElement()).ifPresent(jarFile -> list.add(jarFile));
         }
-        return mapper.apply(path, list.stream());
+        return mapper.apply(path, list.stream().flatMap(jarFile -> {
+            Stream<JarEntry> entry = jarFile.stream();
+            return entry.filter(item -> item.getName().startsWith(path));
+        }));
     }
 
-    public <R> R scan(Package rootPackage, BiFunction<String, Stream<JarFile>, R> mapper) throws IOException {
+    public <R> R scan(Package rootPackage, BiFunction<String, Stream<ZipEntry>, R> mapper) throws IOException {
         String rootName = rootPackage.getName();
         String path = rootName.replaceAll("\\.", "/");
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

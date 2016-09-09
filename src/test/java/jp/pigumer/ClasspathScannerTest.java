@@ -16,12 +16,10 @@ public class ClasspathScannerTest {
     @Test
     public void test() throws Exception {
         List<ZipEntry> urls = sut.scan(Package.getPackage("org.junit"),
-                (path, stream) -> stream.flatMap(jarFile -> jarFile.stream())
-                        .filter(entry -> entry.getName().startsWith(path + "/"))
-                        .map(entry -> {
-                            System.out.println(entry.getName());
-                            return entry;
-                        }).collect(Collectors.toList()));
+                (path, stream) -> stream.map(entry -> {
+                    System.out.println(entry.getName());
+                    return entry;
+                }).collect(Collectors.toList()));
         assertThat(urls.isEmpty(), is(false));
     }
 }

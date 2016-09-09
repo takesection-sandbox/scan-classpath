@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     compile 'org.springframework:spring-context:4.3.2.RELEASE'
+    compile 'junit:junit:4.12'
 
     testCompile 'org.springframework:spring-test:4.3.2.RELEASE'
 }

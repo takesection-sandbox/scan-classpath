@@ -11,7 +11,7 @@ class ClasspathScanner {
   private def getUrl(url: URL): URL = {
     val file: String = url.getFile
     val index = file.indexOf("!/")
-    return if (index != -1) {
+    if (index != -1) {
       val jarFile = file.substring(0, index)
       try {
         new URL(jarFile)

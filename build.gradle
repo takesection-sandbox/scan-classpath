@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'scala'
 apply plugin: 'eclipse'
 
 sourceCompatibility = '1.8'
@@ -9,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    compile 'org.scala-lang:scala-library:2.11.8'
     compile 'junit:junit:4.12'
     compile files('jar libs/scan-classpath.jar')
 }

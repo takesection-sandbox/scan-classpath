@@ -3,7 +3,6 @@ package jp.pigumer;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.zip.ZipEntry;
 
 public class ClasspathScannerTest {
 
@@ -11,9 +10,7 @@ public class ClasspathScannerTest {
 
     @Test
     public void test() throws Exception {
-        List<ZipEntry> list = sut.scan(Thread.currentThread().getContextClassLoader(), "org.junit");
-        for(ZipEntry entry : list) {
-            System.out.println(entry.getName());
-        }
+        List<String> list = sut.scan(Thread.currentThread().getContextClassLoader(), "org.junit");
+        list.forEach(path -> System.out.println(path));
     }
 }

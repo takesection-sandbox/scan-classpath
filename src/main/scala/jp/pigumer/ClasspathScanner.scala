@@ -33,25 +33,25 @@ class ClasspathScanner {
     new JarFile(uri.getSchemeSpecificPart)
   }
 
-  private def listFiles(url: URL, path: String): Array[String] = {
-    val file = new File(url.getFile)
-    if (file.isDirectory) {
-      val files = for (file <- file.listFiles()) yield {
-        listFiles(file.toURI.toURL, path + "/" + file.getName)
-      }
-      files.flatten
-    } else {
-      Array(path)
+  private def files(f: File, path: String): Seq[String] = {
+    if (f.isFile) {
+      List(path)
     }
+    files(f, path + "/" + f.getName)
   }
 
-  private def listEntries(jarFile: JarFile, path: String): Array[String] = {
+  private def listFiles(url: URL, path: String): Seq[String] = {
+    val root = new File(url.getFile)
+    files(root, path)
+  }
+
+  private def listEntries(jarFile: JarFile, path: String): Seq[String] = {
     val list = for {
       entry <- jarFile.entries()
       if (!entry.isDirectory)
       if (entry.getName.startsWith(path))
     } yield entry.getName
-    list.toArray
+    list.toList
   }
 
   def scan(classLoader: ClassLoader, path: String): java.util.List[String] = {

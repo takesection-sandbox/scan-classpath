@@ -46,26 +46,28 @@ class ClasspathScanner {
   }
 
   private def listEntries(jarFile: JarFile, path: String): Seq[String] = {
-    val list = for {
-      entry <- jarFile.entries()
-      if (!entry.isDirectory)
-      if (entry.getName.startsWith(path))
-    } yield entry.getName
+    val entries = jarFile.entries()
+    val filtered = entries.filter(e ⇒ !e.isDirectory && e.getName.startsWith(path))
+    val list = filtered.map {
+      entry ⇒ entry.getName
+    }
     list.toList
   }
 
   def scan(classLoader: ClassLoader, path: String): java.util.List[String] = {
     val convertedPath = path.replaceAll("\\.", "/")
     val urls = classLoader.getResources(convertedPath)
-    val list = for (url <- urls) yield {
-      val resourceUrl = getUrl(url)
-      val resourceFile = resourceUrl.getFile
-      if (resourceFile.endsWith(".jar")) {
-        listEntries(getJarFile(resourceUrl), convertedPath + "/")
-      } else {
-        listFiles(resourceUrl, convertedPath)
+    val seq = urls.flatMap {
+      url ⇒ {
+        val resourceUrl = getUrl(url)
+        val resourceFile = resourceUrl.getFile
+        if (resourceFile.endsWith(".jar")) {
+          listEntries(getJarFile(resourceUrl), convertedPath + "/")
+        } else {
+          listFiles(resourceUrl, convertedPath)
+        }
       }
     }
-    list.flatten.toList
+    seq.toList
   }
 }

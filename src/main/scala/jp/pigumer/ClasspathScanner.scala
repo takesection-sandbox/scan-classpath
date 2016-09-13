@@ -35,9 +35,11 @@ class ClasspathScanner {
 
   private def files(f: File, path: String): Seq[String] = {
     if (f.isFile) {
-      List(path)
+      return List(path)
     }
-    files(f, path + "/" + f.getName)
+    f.listFiles().flatMap {
+      file ⇒ files(file, path + "/" + file.getName)
+    }
   }
 
   private def listFiles(url: URL, path: String): Seq[String] = {

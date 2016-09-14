@@ -8,20 +8,28 @@ import collection.JavaConversions._
 
 class ClasspathScanner {
 
+  private def getFileUrl(url: String): Either[MalformedURLException, URL] = {
+    try {
+      Right(new URL(url))
+    } catch {
+      case e: MalformedURLException ⇒ Left(e)
+    }
+  }
+
   private def getUrl(url: URL): URL = {
     val file: String = url.getFile
     val index = file.indexOf("!/")
     if (index != -1) {
       val jarFile = file.substring(0, index)
-      try {
-        new URL(jarFile)
-      } catch {
-        case e: MalformedURLException ⇒
+      getFileUrl(jarFile) match {
+        case Right(url) ⇒ url
+        case Left(e) ⇒ {
           if (jarFile.startsWith("/")) {
             new URL("file:" + jarFile)
           } else {
             new URL("file:/" + jarFile)
           }
+        }
       }
     } else {
       url
